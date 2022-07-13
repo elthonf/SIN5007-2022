@@ -10,4 +10,4 @@ Passos para continuar os experimentos:
 
 
 # 3 - Rodar os treinamentos em si.
-Executar arquivos `TreinaProcessa*.py`para cada tipo de treino desejado
+Executar classes e funções do arquivo `TreinaProcessaIndutores.py`para cada tipo de treino desejado
