@@ -274,7 +274,8 @@ class ProcessBase:
 
         X, y, cols_X, col_y, dataset = self.get_dataset(percent=p.get("dataset", {}).get("percent", 1),
                                                         normaliza=p.get("dataset", {}).get("percent", False))
-        resposta = self.TreinoEValidacao_cruzada(k=10,
+        kfolds = 10
+        resposta = self.TreinoEValidacao_cruzada(k=kfolds,
                                                  X=np.array(X),
                                                  y=np.array(y),
                                                  cols_X=cols_X,
@@ -285,19 +286,19 @@ class ProcessBase:
         medidas_resposta = {
             "f1_score": resposta['tabmetricas']['f1_score'].mean(),
             "f1_score_ic": scipy.stats.norm.interval(0.98, loc=resposta['tabmetricas']['f1_score'].mean(),
-                                                     scale=resposta['tabmetricas']['f1_score'].std()),
+                                                     scale=resposta['tabmetricas']['f1_score'].std() / np.sqrt(kfolds)),
 
             "accuracy_score": resposta['tabmetricas']['accuracy_score'].mean(),
             "accuracy_score_ic": scipy.stats.norm.interval(0.98, loc=resposta['tabmetricas']['accuracy_score'].mean(),
-                                                           scale=resposta['tabmetricas']['accuracy_score'].std()),
+                                                           scale=resposta['tabmetricas']['accuracy_score'].std() / np.sqrt(kfolds)),
 
             "recall_score": resposta['tabmetricas']['recall_score'].mean(),
             "recall_score_ic": scipy.stats.norm.interval(0.98, loc=resposta['tabmetricas']['recall_score'].mean(),
-                                                         scale=resposta['tabmetricas']['recall_score'].std()),
+                                                         scale=resposta['tabmetricas']['recall_score'].std() / np.sqrt(kfolds)),
 
             "precision_score": resposta['tabmetricas']['precision_score'].mean(),
             "precision_score_ic": scipy.stats.norm.interval(0.98, loc=resposta['tabmetricas']['precision_score'].mean(),
-                                                            scale=resposta['tabmetricas']['precision_score'].std()),
+                                                            scale=resposta['tabmetricas']['precision_score'].std() / np.sqrt(kfolds)),
             "Avaliação": 'Total',
             "inicio": dt_hr_inicio.isoformat(),
             "fim": datetime.datetime.now().isoformat(),
@@ -496,17 +497,17 @@ class ProcessaDeepLearning(ProcessBase):
     def fit_model(self, model, X, y, df):
         epochs_vector, mse = train_modeldl(model=model,
                                            dataset=df,
-                                           epochs = 15,
-                                           batch_size = 1000,
-                                           label_name = self.col_y)
+                                           epochs=15,
+                                           batch_size=1000,
+                                           label_name=self.col_y)
 
         return model, epochs_vector, mse
-
 
     def predict_model(self, model, X, df, indexes):
         input_features_array = {name: np.array(value) for name, value in df[self.cols_X].iloc[indexes].items()}
 
         preditos = model[0].predict(input_features_array)
-        preditos = np.round(preditos)
+        #preditos = np.round(preditos)
+        preditos = [0.0 if v < 0.5 else 1.0 for v in preditos]
 
         return preditos

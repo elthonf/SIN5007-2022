@@ -2,19 +2,7 @@ import unittest
 
 
 class MyTestCase(unittest.TestCase):
-    def Atest_processa01(self):
-        from processaBase import ProcessContent
-        from processaBase import ProcessaSVM
-
-        processa = ProcessaSVM(mytype=ProcessContent.SELECT01)
-        processa.processa_plano_id(60)
-        pass
-
-        for a in range(32):
-            print( f"python main.py 1 {a} & ")
-            if (a+1) % 6 == 0:
-                print(f"wait\n")
-    def test_processaRandomForest(self):
+    def Atest_processaRandomForest(self):
         from processaBase import ProcessContent
         from processaBase import ProcessaRandomForest
 
